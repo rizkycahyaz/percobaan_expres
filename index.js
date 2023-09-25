@@ -6,7 +6,11 @@ const port = 3000
   //  res.send('halo love dek')
 //})
 
-const mhsRouter = require ('./routes/mahasiswa')
+const bodyPs =require('body-parser');
+app.use(bodyPs.urlencoded({extended: false}));
+app.use(bodyPs.json());
+
+const mhsRouter = require ('./routes/mahasiswa');
 app.use('/api/mhs',mhsRouter);
 
 app.listen(port,() => {
