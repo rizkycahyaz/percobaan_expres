@@ -77,7 +77,7 @@ router.get('/(:id)', function (req, res) {
     })
   })
 
-  router.patch('/update/:id', [
+router.patch('/update/:id', [
     body('nama').notEmpty(),
     body('nrp').notEmpty()
 ], (req, res) => {
@@ -106,5 +106,25 @@ router.get('/(:id)', function (req, res) {
         }
     })
 })
+
+router.delete("/delete/:id", function (req, res) {
+    let id = req.params.id;
+    connection.query(
+      `delete from mahasiswa where id_m = ${id}`,
+      function (err, rows) {
+        if (err) {
+          return res.status(500).json({
+            status: false,
+            message: "Server failed",
+          });
+        } else {
+          return res.status(200).json({
+            status: true,
+            message: "Data Berhasil Dihapus",
+          });
+        }
+      }
+    );
+  });
 
 module.exports = router;
