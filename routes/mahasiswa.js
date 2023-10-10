@@ -5,8 +5,11 @@ const {body , validationResult}  = require('express-validator');
 
 const connection = require('../config/bd');
 const multer = require('multer');
+
 const path = require('path')
-const fs = require('fs')
+const fs = require('fs');
+const { error } = require('console');
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null,'public/images')
@@ -16,7 +19,15 @@ const storage = multer.diskStorage({
       cb(null, Date.now() + path.extname(file.originalname))
     }
 })
-const upload = multer({storage: storage})
+const fileFilter = (req, file, cb) => {
+  // Mengecek jenis file yang diizinkan (misalnya, hanya gambar JPEG atau PNG)
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true); // Izinkan file
+  } else {
+    cb(new Error('Jenis file tidak diizinkan'), false); // Tolak file
+  }
+};
+const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 
 
