@@ -4,6 +4,22 @@ const router = express.Router();
 const {body , validationResult}  = require('express-validator');
 
 const connection = require('../config/bd');
+const multer = require('multer');
+const path = require('path')
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null,'public/images')
+    },
+    filename: (req, file, cb) => {
+      console.log(file)
+      cb(null, Date.now() + path.extname(file.originalname))
+    }
+})
+const upload = multer({storage: storage})
+
+
+
 
 router.get("/", function (req, res) {
   connection.query(
@@ -28,9 +44,7 @@ router.get("/", function (req, res) {
   );
 });
 
-router.post(
-  "/store",
-  [
+router.post( "/store",upload.single("gambar"),[
     body("nama").notEmpty(),
     body("nrp").notEmpty(),
     body("id_jurusan").notEmpty(),
@@ -46,6 +60,7 @@ router.post(
       nama: req.body.nama,
       nrp: req.body.nrp,
       id_jurusan: req.body.id_jurusan,
+      gambar: req.file.filename
     };
     connection.query(
       "insert into mahasiswa set ? ",
