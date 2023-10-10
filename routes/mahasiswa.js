@@ -6,7 +6,7 @@ const {body , validationResult}  = require('express-validator');
 const connection = require('../config/bd');
 const multer = require('multer');
 const path = require('path')
-
+const fs = require('fs')
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null,'public/images')
@@ -111,7 +111,7 @@ router.get("/(:id)", function (req, res) {
 });
 
 router.patch(
-  "/update/:id",
+  "/update/:id",upload.single("gambar"),
   [
     body("nama").notEmpty(),
     body("nrp").notEmpty(),
@@ -125,31 +125,54 @@ router.patch(
       });
     }
     let id = req.params.id;
-    let data = {
-      nama: req.body.nama,
-      nrp: req.body.nrp,
-      id_jurusan: req.body.id_jurusan,
-    };
-    connection.query(
-      `update mahasiswa set ? where id_m = ${id}`,
-      data,
-      function (err, rows) {
+    let gambar = req.file ? req.file.filename : null;
+
+    connection.query(`select * from mahasiswa where id_m = ${id}`,function(err, rows){
+      if(err){
+        return res.status(500).json({
+          status : false,
+          message :'Not Found',
+        })
+      }
+      if(rows.length ===0){
+        return res.status(404).json({
+          status : false,
+          message : 'Not Found',
+        })
+      }
+      const nameFilelama = rows[0].gambar;
+
+      if (nameFilelama && gambar){
+        const pathFilelama = path.join(__dirname,'../public/images', nameFilelama);
+        fs.unlinkSync(pathFilelama);
+      }
+
+      let Data = {
+        nama: req.body.nama,
+        nrp: req.body.nrp,
+        id_jurusan: req.body.id_jurusan,
+        gambar: gambar
+      }
+
+      connection.query( `update mahasiswa set ? where id_m = ${id}`,Data,function (err, rows) {
         if (err) {
           return res.status(500).json({
             status: false,
             message: "server error",
-          });
-        } else {
+          })
+        }else{
           return res.status(200).json({
             status: true,
             message: "update",
-          });
-        }
+        })
       }
-    );
-  }
-);
+    })
+  })
 
+
+})
+
+    
 router.delete("/delete/(:id)", function (req, res) {
   let id = req.params.id;
   connection.query(
