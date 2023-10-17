@@ -10,6 +10,9 @@ const bodyPs =require('body-parser');
 app.use(bodyPs.urlencoded({extended: false}));
 app.use(bodyPs.json());
 
+const cors = require('cors')
+app.use(cors())
+
 const mhsRouter = require ('./routes/mahasiswa');
 app.use('/api/mhs',mhsRouter);
 const jurusanRouter = require("./routes/jurusan.js");
