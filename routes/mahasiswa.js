@@ -182,47 +182,47 @@ router.patch('/update/:id',upload.fields([{name:'gambar',maxCount:1},{name:'swa_
 
 
     
-router.delete('/delete/(:id)', function(req, res){
+router.delete("/delete/(:id)", function (req, res) {
   let id = req.params.id;
 
-  connection.query(`select * from mahasiswa where id_m = ${id}`, function (err, rows) {
-      if(err){
-          return res.status(500).json({
-              status: false,
-              message: 'Server Error',
-          })
+  connection.query(
+    `select * from mahasiswa where id_m = ${id}`,
+    function (err, rows) {
+      if (err) {
+        return res.status(500).json({
+          status: false,
+          message: "server error",
+        });
       }
-      if(rows.length ===0){
-          return res.status(404).json({
-              status: false,
-              message: 'Not Found',
-          })
+      if (rows.length === 0) {
+        return res.status(404).json({
+          status: false,
+          message: "not found",
+        });
       }
       const namaFileLama = rows[0].gambar;
-
-      // Hapus file lama jika ada
       if (namaFileLama) {
-          const pathFileLama = path.join(__dirname, '../public/images', namaFileLama);
-          fs.unlinkSync(pathFileLama);
+        const patchFileLama = path.join(__dirname,"../public/images",namaFileLama);
+        fs.unlinkSync(patchFileLama);
       }
-
-      
-      connection.query(`delete from mahasiswa where id_m = ${id}`, function (err, rows) {
-          if(err){
-              return res.status(500).json({
-                  status: false,
-                  message: 'Server Error',
-              })
-          }else{
-              return res.status(200).json({
-                  status: true,
-                  message: 'Data  telah dihapus !',
-              })
+      connection.query(
+        `delete from mahasiswa where id_m = ${id}`,
+        function (err, rows) {
+          if (err) {
+            return res.status(500).json({
+              status: false,
+              message: "server error",
+            });
+          } else {
+            return res.status(200).json({
+              status: true,
+              message: "data berhasil dihapus",
+            });
           }
-      })
-
-  })
-
+        }
+      );
+    }
+  );
 });
 
 module.exports = router;
