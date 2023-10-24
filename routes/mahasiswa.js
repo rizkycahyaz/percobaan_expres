@@ -32,9 +32,7 @@ const upload = multer({ storage: storage, fileFilter: fileFilter });
 
 router.get("/", function (req, res) {
   connection.query(
-    " SELECT mahasiswa.nama, jurusan.nama_jurusan " +
-      " from mahasiswa join jurusan " +
-      " ON mahasiswa.id_jurusan=jurusan.id_j order by mahasiswa.id_m desc",
+    "SELECT a.*,b.nama_jurusan AS jurusan FROM mahasiswa a JOIN jurusan b ON b.id_j = a.id_jurusan ORDER BY a.id_m DESC",
     function (err, rows) {
       if (err) {
         return res.status(500).json({
@@ -139,6 +137,7 @@ router.patch('/update/:id',upload.fields([{name:'gambar',maxCount:1},{name:'swa_
           return res.status(500).json({
               status:false,
               message:'server error',
+              error: err
           })
       }
       if(rows.length === 0){
@@ -162,15 +161,21 @@ router.patch('/update/:id',upload.fields([{name:'gambar',maxCount:1},{name:'swa_
       let Data = {
           nama: req.body.nama,
           nrp: req.body.nrp,
-          id_jurusan: req.body.id_jurusan,
-          gambar: gambar,
-          swa_foto:swa_foto
+          id_jurusan: req.body.id_jurusan
+      }
+
+      if (gambar) {
+        Data.gambar = gambar;
+      }
+      if (swa_foto) {
+        Data.swa_foto = swa_foto;
       }
       connection.query(`update mahasiswa set ? where id_m = ${id}`, Data, function (err, rows) {
           if(err){
               return res.status(500).json({
                   status: false,
                   message: 'Server Error',
+                  error: err
               })
           } else {
               return res.status(200).json({
