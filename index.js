@@ -12,10 +12,11 @@ app.use(cors())
 const path = require('path')
 app.use('/static', express.static(path.join(__dirname, 'public/images')))
 
-
+const auth = require ('./routes/auth/auth')
+app.use('/api/auth', auth);
 const mhsRouter = require ('./routes/mahasiswa');
 app.use('/api/mhs',mhsRouter);
-const jurusanRouter = require("./routes/jurusan.js");
+const jurusanRouter = require("./routes/jurusan");
 app.use("/api/jurusan", jurusanRouter);
 
 app.listen(port,() => {
